@@ -1,7 +1,6 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import dotenv from 'dotenv';
 dotenv.config();
-
 export const sequelize = new Sequelize(
     process.env.DB_NAME || 'blogdb',
     process.env.DB_USER || 'root',
@@ -13,7 +12,6 @@ export const sequelize = new Sequelize(
         logging: false,
     }
 );
-
 export const User = sequelize.define('User', {
     id: {
         type: DataTypes.INTEGER,
@@ -55,7 +53,6 @@ export const User = sequelize.define('User', {
     createdAt: 'createAt',
     updatedAt: 'updateAt',
 });
-
 export const Blog = sequelize.define('Blog', {
     id: {
         type: DataTypes.INTEGER,
@@ -88,17 +85,13 @@ export const Blog = sequelize.define('Blog', {
     createdAt: 'createAt',
     updatedAt: 'updateAt',
 });
-
-// Associations
 User.hasMany(Blog, { foreignKey: 'userId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 Blog.belongsTo(User, { foreignKey: 'userId' });
-
 export async function initDB() {
     await sequelize.authenticate();
-    await sequelize.sync({ alter: true }); // alter:true adds missing columns automatically
+    await sequelize.sync({ alter: true });
     console.log('DB is connected and table is synced');
 }
-
 export async function closeDB() {
     await sequelize.close();
 }

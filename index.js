@@ -1,14 +1,5 @@
 import { User, Blog } from './db.js';
 import { Op } from 'sequelize';
-
-// ─────────────────────────────────────────────
-//  AUTH
-// ─────────────────────────────────────────────
-
-/**
- * Register a new user account.
- * Returns the created User, or null if the email is already taken.
- */
 export async function userRegistration(firstName, lastName, email, phoneNumber, password) {
     try {
         const existing = await User.findOne({ where: { email } });
@@ -24,12 +15,6 @@ export async function userRegistration(firstName, lastName, email, phoneNumber, 
         return null;
     }
 }
-
-/**
- * Authenticate a user by email + password.
- * Returns the User object on success, or null on failure.
- * Deactivated accounts are blocked here.
- */
 export async function login(email, password) {
     try {
         const user = await User.findOne({ where: { email } });
@@ -52,14 +37,6 @@ export async function login(email, password) {
         return null;
     }
 }
-
-// ─────────────────────────────────────────────
-//  USER MANAGEMENT  (Admin)
-// ─────────────────────────────────────────────
-
-/**
- * List all users. Admin only.
- */
 export async function allUsers() {
     try {
         const users = await User.findAll({
@@ -80,12 +57,7 @@ export async function allUsers() {
         return [];
     }
 }
-
 export { allUsers as listUsers };
-
-/**
- * Find a user by primary key (id).
- */
 export async function searchUser(id) {
     try {
         const user = await User.findByPk(id);
@@ -100,12 +72,6 @@ export async function searchUser(id) {
         return null;
     }
 }
-
-/**
- * Update a user's fields. Admin only.
- * @param {number} id - User ID
- * @param {object} data - Fields to update (e.g. { isActive: false, role: 'admin' })
- */
 export async function updateUser(id, data) {
     try {
         const user = await User.findByPk(id);
@@ -121,10 +87,6 @@ export async function updateUser(id, data) {
         return null;
     }
 }
-
-/**
- * Delete a user by ID. Admin only. Cascades to their blogs.
- */
 export async function deleteUser(id) {
     try {
         const user = await User.findByPk(id);
@@ -140,14 +102,6 @@ export async function deleteUser(id) {
         return false;
     }
 }
-
-// ─────────────────────────────────────────────
-//  BLOG — READER  (no login required)
-// ─────────────────────────────────────────────
-
-/**
- * View all blogs with author info. Available to anyone.
- */
 export async function allBlog() {
     try {
         const blogs = await Blog.findAll({
@@ -172,15 +126,6 @@ export async function allBlog() {
         return [];
     }
 }
-
-// ─────────────────────────────────────────────
-//  BLOG — USER  (own blogs only)
-// ─────────────────────────────────────────────
-
-/**
- * Get all blogs belonging to a specific user.
- * Prints "No blogs are found" if the user has none (per spec).
- */
 export async function getUserBlogs(userId) {
     try {
         const blogs = await Blog.findAll({
@@ -201,10 +146,6 @@ export async function getUserBlogs(userId) {
         return [];
     }
 }
-
-/**
- * Create a new blog post for the given user.
- */
 export async function createBlog(userId, blogTitle, blog, category) {
     try {
         const newBlog = await Blog.create({ userId, blogTitle, blog, category });
@@ -215,37 +156,24 @@ export async function createBlog(userId, blogTitle, blog, category) {
         return null;
     }
 }
-
-/**
- * Search blogs by ID or partial title.
- * If userId is provided, results are scoped to that user's blogs only.
- * @param {string} query
- * @param {number|null} userId - Scope search to a specific user (User journey). Pass null for Admin.
- */
 export async function searchBlog(query, userId = null) {
     try {
         const isNumeric = !isNaN(query) && query.trim() !== '' && !isNaN(parseFloat(query));
-
         let whereClause = isNumeric
             ? { [Op.or]: [{ id: Number(query) }, { blogTitle: { [Op.like]: `%${query}%` } }] }
             : { blogTitle: { [Op.like]: `%${query}%` } };
-
-        // Scope to user's own blogs if userId is provided
         if (userId !== null) {
             whereClause = { ...whereClause, userId };
         }
-
         const blogs = await Blog.findAll({
             where: whereClause,
             include: [{ model: User, attributes: ['firstName', 'lastName'] }],
             order: [['id', 'ASC']],
         });
-
         if (blogs.length === 0) {
             console.log('  Blog not found.');
             return [];
         }
-
         blogs.forEach(b => {
             const author = b.User ? `${b.User.firstName} ${b.User.lastName}` : 'Unknown';
             console.log(`\n  [${b.id}] ${b.blogTitle}  |  ${b.category}  |  By: ${author}`);
@@ -257,14 +185,6 @@ export async function searchBlog(query, userId = null) {
         return [];
     }
 }
-
-/**
- * Update a blog's fields.
- * If userId is provided, enforces ownership — the user can only update their own blogs.
- * @param {number} id - Blog ID
- * @param {object} data - Fields to update
- * @param {number|null} userId - Owner check. Pass null to skip (Admin).
- */
 export async function updateBlog(id, data, userId = null) {
     try {
         const blog = await Blog.findByPk(id);
@@ -272,7 +192,6 @@ export async function updateBlog(id, data, userId = null) {
             console.log('  Blog not found.');
             return null;
         }
-        // Ownership check for regular users
         if (userId !== null && blog.userId !== userId) {
             console.log('  ⚠  You can only update your own blogs.');
             return null;
@@ -285,13 +204,6 @@ export async function updateBlog(id, data, userId = null) {
         return null;
     }
 }
-
-/**
- * Delete a blog by ID.
- * If userId is provided, enforces ownership — the user can only delete their own blogs.
- * @param {number} id - Blog ID
- * @param {number|null} userId - Owner check. Pass null to skip (Admin).
- */
 export async function deleteBlog(id, userId = null) {
     try {
         const blog = await Blog.findByPk(id);
@@ -299,7 +211,6 @@ export async function deleteBlog(id, userId = null) {
             console.log('  Blog not found.');
             return false;
         }
-        // Ownership check for regular users
         if (userId !== null && blog.userId !== userId) {
             console.log('  ⚠  You can only delete your own blogs.');
             return false;
@@ -313,14 +224,6 @@ export async function deleteBlog(id, userId = null) {
         return false;
     }
 }
-
-// ─────────────────────────────────────────────
-//  BLOG — ADMIN  (all users' blogs)
-// ─────────────────────────────────────────────
-
-/**
- * View all blogs from all users, with author info. Admin only.
- */
 export async function allUsersBlog() {
     try {
         const blogs = await Blog.findAll({
@@ -342,11 +245,6 @@ export async function allUsersBlog() {
         return [];
     }
 }
-
-// ─────────────────────────────────────────────
-//  UTILITIES
-// ─────────────────────────────────────────────
-
 function formatDate(dateStr) {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleString('en-GB', {
@@ -354,10 +252,6 @@ function formatDate(dateStr) {
         hour: '2-digit', minute: '2-digit',
     });
 }
-
-/**
- * Render an array of objects as a plain-text aligned table in the console.
- */
 function formatTable(rows, columns) {
     if (!rows.length) return '';
     const widths = columns.map(col =>

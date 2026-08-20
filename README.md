@@ -234,6 +234,12 @@ Blog-Management-System/
 
 ---
 
-## 📄 License
+## 👤 Author
 
-ISC
+**Sazia Afrin Dima**
+
+---
+
+## 📌 Project Status
+
+**Status:** CRUD project
