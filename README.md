@@ -6,6 +6,7 @@ A **console-based blog management application** built with Node.js, Sequelize OR
 
 ## 📋 Table of Contents
 
+- [Demo Video](#demo-video)
 - [Project Description](#project-description)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -13,6 +14,21 @@ A **console-based blog management application** built with Node.js, Sequelize OR
 - [Setup Instructions](#setup-instructions)
 - [Usage Instructions](#usage-instructions)
 - [Project Structure](#project-structure)
+
+---
+
+## 🎥 Demo Video
+
+Watch the full walkthrough of the **Blog Management System** in action — including user registration, login, blog creation, search, update, delete, and admin panel features.
+
+> 📺 **[▶ Click here to watch the demo on Google Drive](https://drive.google.com/file/d/1_3CRknt1Q7fgPT4oKT6Z2O1Hgo_ERbMd/view?usp=drive_link)**
+
+The demo covers:
+- 👁️ Viewing all published blogs as a guest
+- 👤 Registering a new user account
+- 🔐 Logging in and navigating the user menu
+- ✏️ Creating, searching, updating, and deleting blog posts
+- 🛡️ Admin login and full system management (users & blogs)
 
 ---
 
@@ -238,8 +254,23 @@ Blog-Management-System/
 
 **Sazia Afrin Dima**
 
----
+
 
 ## 📌 Project Status
 
-**Status:** CRUD project
+**Status:** ✅ Completed — Fully Functional
+
+This project is **complete and working** as a full-featured CLI-based Blog Management System. All core features have been implemented and tested.
+
+| Area                    | Status  | Notes                                                   |
+|-------------------------|---------|---------------------------------------------------------|
+| User Registration/Login | ✅ Done  | Email-based auth with role routing                      |
+| Role-Based Access       | ✅ Done  | Separate menus for `user` and `admin` roles             |
+| Blog CRUD (User)        | ✅ Done  | Create, read, search, update, delete own blogs          |
+| Admin Controls          | ✅ Done  | Manage all users and blogs system-wide                  |
+| Input Validation        | ✅ Done  | All menu inputs validated against empty/invalid entries |
+| Account Deactivation    | ✅ Done  | Deactivated users blocked at login                      |
+| Database (MySQL)        | ✅ Done  | Sequelize ORM with auto-sync and cascade deletes        |
+| Environment Config      | ✅ Done  | Secure `.env` setup via dotenv                          |
+
+
